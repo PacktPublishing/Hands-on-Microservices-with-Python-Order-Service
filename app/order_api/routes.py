@@ -1,7 +1,7 @@
-from flask import jsonify, request
+from flask import jsonify, request, make_response
 from . import order_api_blueprint
 from models import db, Order, OrderItem
-from flask_login import login_required, current_user
+from .api.UserClient import UserClient
 
 
 @order_api_blueprint.route('/api/orders', methods=['GET'])
@@ -16,16 +16,20 @@ def orders():
     return response
 
 
-@login_required
 @order_api_blueprint.route('/api/order/add-item', methods=['POST'])
 def order_add_item():
 
-    if not current_user.is_authenticated:
-        return jsonify({'message': 'Access Denied'}), 401
+    api_key = request.headers.get('Authorization')
+    response = UserClient.get_user(api_key)
+
+    if not response:
+        return make_response(jsonify({'message': 'Not logged in'}), 401)
+
+    user = response['result']
 
     p_id = int(request.form['product_id'])
     qty = int(request.form['qty'])
-    u_id = int(current_user.id)
+    u_id = int(user['id'])
 
     # Find open order
     known_order = Order.query.filter_by(user_id=u_id, is_open=1).first()
@@ -44,7 +48,7 @@ def order_add_item():
         # Check if we already have an order item with that product
         for item in known_order.items:
 
-            if item.product.id == p_id:
+            if item.product_id == p_id:
                 found = True
                 item.quantity += qty
 
@@ -60,47 +64,17 @@ def order_add_item():
     return response
 
 
-@login_required
-@order_api_blueprint.route('/api/order/update', methods=['POST'])
-def order_update():
-
-    if not current_user.is_authenticated:
-        return jsonify({'message': 'Access Denied'}), 401
-
-    items = request.form['items']
-
-    u_id = int(current_user.id)
-
-    # Find open order
-    known_order = Order.query.filter_by(user_id=u_id, is_open=1).first()
-
-    if known_order is None:
-        # Create the order
-        known_order = Order()
-        known_order.create()
-
-    # Delete any exiting order items
-    known_order.items = []
-
-    for item in items:
-        order_item = OrderItem(item.product.id, item.quantity)
-        known_order.items.append(order_item)
-
-    db.session.add(known_order)
-    db.session.commit()
-
-    response = jsonify({'result': known_order.to_json()})
-
-    return response
-
-
-@login_required
 @order_api_blueprint.route('/api/order', methods=['GET'])
 def order():
-    if not current_user.is_authenticated:
-        return jsonify({'message': 'Access Denied'}), 401
+    api_key = request.headers.get('Authorization')
+    response = UserClient.get_user(api_key)
 
-    open_order = Order.query.filter_by(user_id=current_user.id, is_open=1).first()
+    if not response:
+        return make_response(jsonify({'message': 'Not logged in'}), 401)
+
+    user = response['result']
+
+    open_order = Order.query.filter_by(user_id=user['id'], is_open=1).first()
 
     if open_order is None:
         response = jsonify({'message': 'No order found'})
@@ -110,23 +84,22 @@ def order():
     return response
 
 
-@order_api_blueprint.route('/api/order/create', methods=['POST'])
-def post_create():
+@order_api_blueprint.route('/api/order/checkout', methods=['POST'])
+def checkout():
+    api_key = request.headers.get('Authorization')
+    response = UserClient.get_user(api_key)
 
-    name = request.form['name']
-    slug = request.form['slug']
-    image = request.form['image']
-    price = request.form['price']
+    if not response:
+        return make_response(jsonify({'message': 'Not logged in'}), 401)
 
-    item = Order()
-    item.name = name
-    item.slug = slug
-    item.image = image
-    item.price = price
+    user = response['result']
 
-    db.session.add(item)
+    order_model = Order.query.filter_by(user_id=user['id'], is_open=1).first()
+    order_model.is_open = 0
+
+    db.session.add(order_model)
     db.session.commit()
 
-    response = jsonify({'message': 'Product added', 'product': item.to_json()})
+    response = jsonify({'result': order_model.to_json()})
 
     return response

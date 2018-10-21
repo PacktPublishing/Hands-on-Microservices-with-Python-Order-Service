@@ -25,8 +25,8 @@ class Order(db.Model):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    def create(self, user):
-        self.user_id = user.id
+    def create(self, user_id):
+        self.user_id = user_id
         self.is_open = True
         return self
 
@@ -38,6 +38,7 @@ class Order(db.Model):
         return {
             'items': items,
             'is_open': self.is_open,
+            'user_id': self.user_id
         }
 
 
