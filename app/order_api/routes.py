@@ -1,7 +1,15 @@
-from flask import jsonify, request, make_response
+from flask import jsonify,json, request, make_response
 from . import order_api_blueprint
 from models import db, Order, OrderItem
 from .api.UserClient import UserClient
+
+
+@order_api_blueprint.route("/api/order/docs.json", methods=['GET'])
+def swagger_api_docs_yml():
+    with open('swagger.json') as fd:
+        json_data = json.load(fd)
+
+    return jsonify(json_data)
 
 
 @order_api_blueprint.route('/api/orders', methods=['GET'])

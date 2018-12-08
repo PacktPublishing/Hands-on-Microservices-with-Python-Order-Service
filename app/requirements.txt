@@ -3,5 +3,6 @@ requests==2.19.1
 SQLAlchemy==1.2.8
 Flask-SQLAlchemy==2.3.2
 mysql-connector==2.1.6
+flask-swagger-ui==3.18.0
 blinker==1.4
 pytest==3.9.1

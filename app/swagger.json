@@ -1,0 +1,117 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Order service for order management system micro service",
+        "version": "1.0.0",
+        "title": "Order Service"
+    },
+    "host": "192.168.99.102:8083",
+    "basePath": "/api",
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+      "/orders": {
+        "get": {
+          "tags": [
+            "Order"
+          ],
+          "summary": "Get all the orders",
+          "description": "",
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation"
+            }
+          }
+        }
+      },
+      "/order/add-item": {
+        "get": {
+          "tags": [
+            "Order"
+          ],
+          "summary": "Adds an item to the order",
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "name": "p_id",
+              "in": "formData",
+              "description": "Product ID",
+              "required": true,
+              "type": "integer"
+            },
+            {
+              "name": "qty",
+              "in": "formData",
+              "description": "Product quantity",
+              "required": true,
+              "type": "integer"
+            },
+            {
+              "name": "u_id",
+              "in": "formData",
+              "description": "User ID",
+              "required": true,
+              "type": "integer"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Updated order"
+            },
+            "401": {
+              "description": "Not logged in"
+            }
+          }
+        }
+      },
+      "/order": {
+        "post": {
+          "tags": [
+            "Order"
+          ],
+          "summary": "Get an order",
+          "description": "",
+          "consumes": [
+            "multipart/form-data"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "401": {
+              "description": "Not logged in"
+            },
+            "404": {
+              "description": "No order found'"
+            },
+            "200": {
+              "description": "Users order'"
+            }
+          }
+        }
+      },
+      "/order/checkout": {
+        "get": {
+          "tags": [
+            "Order"
+          ],
+          "summary": "Processes the order",
+          "description": "",
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "401": {
+              "description": "Not logged in"
+            }
+          }
+        }
+      }
+    }
+}
