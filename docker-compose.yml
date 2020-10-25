@@ -19,7 +19,7 @@ services:
   order_db:
     image: mysql:5.7.22
     volumes:
-      - product-db-data:/var/lib/mysql
+      - order-db-data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=test
       - MYSQL_DATABASE=order
