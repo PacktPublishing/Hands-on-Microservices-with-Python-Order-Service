@@ -29,7 +29,7 @@
         }
       },
       "/order/add-item": {
-        "get": {
+        "post": {
           "tags": [
             "Order"
           ],
@@ -39,7 +39,7 @@
           ],
           "parameters": [
             {
-              "name": "p_id",
+              "name": "product_id",
               "in": "formData",
               "description": "Product ID",
               "required": true,
