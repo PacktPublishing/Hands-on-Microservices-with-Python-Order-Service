@@ -2,7 +2,8 @@
 venv/*
 env/
 **/*.pytest_cache
-**/__pycache__
+app/order_api/__pycache__
+app/__pycache__
 **/.DS_Store
 app/node_modules/*
 !app/node_modules/.gitkeep
